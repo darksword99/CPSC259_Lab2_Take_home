@@ -6,10 +6,10 @@
               specified sample.  The formatted DNA
               sequence file is a txt file (threes samples
               are provided in the Resource Files folder).
- Author:			Your names
- Student #s:	12345678 and 12345678
- CS Accounts:	a1a1 and b2b2
- Date:				Add the date here
+ Author:			Saif Abdelazim and Sizhe Yan
+ Student #s:	62639422 and 22164982
+ CS Accounts:	n4d3b and q8k3b
+ Date:				October 6th, 2020
  */
 
  /******************************************************************
@@ -252,6 +252,7 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
   int score = 0;
   char outputline_buffer[BUFSIZE] = "\0";
   char int_buffer[BUFSIZE];
+  
 
   /* Hint: Check to see if any candidate segment(s) are a perfect match, and report them
      (REMEMBER: don't ignore trailing nucleotides when searching for a perfect score)
@@ -263,20 +264,33 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
           strcat(outputline_buffer, "Candidate number ");
           strcat(outputline_buffer, int_buffer);
           strcat(outputline_buffer, " is a perfect match\n");*/
+    int sample_length = strlen(*sample_segment);
+    int candidate_length = strlen(**candidate_segments);
+    
 
-  // Insert your code here
+    
+    if(strcmp(*sample_segment,*candidate_segments) == 0)
+    {
+       sprintf(int_buffer, "%d", i); // stores candidate number in char array int_buffer
+       strcat(*sample_segment, "Candidate number ");
+       strcat(*sample_segment, int_buffer);
+       strcat(*sample_segment, " is a perfect match\n");
+  
+    // Insert your code here
 
   /* Hint: Return early if we have found and reported perfect match(es) */
 
-  // Insert your code here
-
+     return;
+    }
   /* Hint: Otherwise we need to calculate and print all of the scores by invoking
      calculate_score for each candidate_segment. Write an output line for each
      candidate_segment and concatenate your line to output_string.
      Don't forget to clear your outputline_buffer for each new line*/
   for (i = 0; i < number_of_candidates; ++i) {
 
-    // Insert your code here - maybe a call to calculate_score?
+    score = calculate_score(*sample_segment,*candidate_segments);// Insert your code here - maybe a call to calculate_score?
+    
+
   }
 
   /* End of function */
@@ -292,19 +306,19 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
  * 3. Ignore any trailing nucleotides (there may be 1 or 2, but not more)
  * 4. For each of the LENGTH codons:
  *    a) if the two codons are exactly the same, add 10 to the score
- *    b) else if the 2 codons are different but specify the same amino acid, add 5 to the score
+ *    b) else if the 2 codons are different but specify the same amino acid(A-T,G-H), add 5 to the score
  *    c) else if the two codons are different and do not specify the same amino acid, then
  *       examine the 3 nucleotides in the codon separately:
  *		 For each of the 3 nucleotides:
  *		i)   If the two nucleotides are the same, add 2 to the score
- *      ii)  If the 2 nucleotides belong to a matching base pair (A and T, or C and G), add 1
- *      iii) Otherwise, add zero to the score (e.g., do nothing)
+ *    ii)  If the 2 nucleotides belong to a matching base pair (A and T, or C and G), add 1
+ *    iii) Otherwise, add zero to the score (e.g., do nothing)
  * 5. Store the result
  * 6. Now skip the first codon in the candidate, e.g., shift the sample by 1 codon,
  *    and check the score of this new alignment.  Compare this score to the score
  *    you calculated before shifting, and store the higher score.  Keep shifting
  *    the sample deeper into the candidate by one codon at a time, checking the score, and
- *    storing ONLY the top score, until itno longer fits. Once the sample (ignoring the
+ *    storing ONLY the top score, until it no longer fits. Once the sample (ignoring the
  *    trailing nucleotides) extends beyond the length of the candidate we stop.
  * PARAM:     pointer to the sample segment
  * PARAM:     pointer to the candidate segment
@@ -321,6 +335,43 @@ int calculate_score(char* sample_segment, char* candidate_segment)
   int sample_length = strlen(sample_segment);
   int candidate_length = strlen(candidate_segment);
   int sample_length_in_codons = sample_length / 3;
+
+/*    4. For each of the LENGTH codons:
+ *    a) if the two codons are exactly the same, add 10 to the score
+ */
+for(int i = 0; i < sample_length_in_codons; i++){
+  if (strncmp(*sample_segment, *candidate_segment, 3) == 0)
+  {
+    temp_score += 10;
+  }
+  else if/*int get_codon_index(char* codon_code)
+{
+  int i;
+  for (i = 0; i < NUMBER_OF_CODONS; ++i) {
+
+    if (codon_codes[i][0] == codon_code[0] &&
+      codon_codes[i][1] == codon_code[1] &&
+      codon_codes[i][2] == codon_code[2]) {
+      return i;
+    }
+  }
+  return -1;
+}*/
+  {
+    
+    
+  }
+
+else{
+
+
+
+
+}
+
+}
+
+
 
   // Insert your code here (replace this return statement with your own code)
   return 0;
