@@ -264,19 +264,19 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
             strcat(outputline_buffer, "Candidate number ");
             strcat(outputline_buffer, int_buffer);
             strcat(outputline_buffer, " is a perfect match\n");*/
-    int sample_length = strlen(*sample_segment);
-    int candidate_length = strlen(**candidate_segments);
+    sample_length = strlen(sample_segment);
+    candidate_length = strlen(candidate_segments);
 
 
 
     for (int i = 0; i < number_of_candidates; i++) {
 
-        if (strcmp(*sample_segment, *candidate_segments) == 0)
+        if (strcmp(sample_segment, candidate_segments[i]) == 0)
         {
             sprintf(int_buffer, "%d", i); // stores candidate number in char array int_buffer
-            strcat(*sample_segment, "Candidate number ");
-            strcat(*sample_segment, int_buffer);
-            strcat(*sample_segment, " is a perfect match\n");
+            strcat(sample_segment, "Candidate number ");
+            strcat(sample_segment, int_buffer);
+            strcat(sample_segment, " is a perfect match\n");
 
 
             has_perfect_match++;
@@ -294,7 +294,7 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
        Don't forget to clear your outputline_buffer for each new line*/
     for (i = 0; i < number_of_candidates; ++i) {
 
-        score = calculate_score(*sample_segment, *candidate_segments);// Insert your code here - maybe a call to calculate_score?
+        score = calculate_score(sample_segment, *candidate_segments);// Insert your code here - maybe a call to calculate_score?
 
 
     }
@@ -346,15 +346,21 @@ int calculate_score(char* sample_segment, char* candidate_segment)
      *    a) if the two codons are exactly the same, add 10 to the score
      */
     for (int i = 0; i < sample_length_in_codons; i++) {
-        if (strncmp(*sample_segment, *candidate_segment, 3) == 0)
+
+        if (iterations == sample_length_in_codons)
+        {
+            break;
+        }
+
+        if (strncmp(sample_segment, candidate_segment, 3) == 0)
         {
             temp_score += 10;
         }
         /*int get_codon_index(char* codon_code)*/
         else if (get_codon_index(*sample_segment) == get_codon_index(*candidate_segment))
         {
-        
-        temp_score += 5;
+
+            temp_score += 5;
 
         }
 
@@ -366,15 +372,15 @@ int calculate_score(char* sample_segment, char* candidate_segment)
             for (int nucleotide = 0; nucleotide <= 2; nucleotide++)
             {
                 // if a character in the sample AND candidate is the same, add 2 to the score
-                if ( *(sample_segment+nucleotide) == *(candidate_segment+nucleotide) )
+                if (*(sample_segment + nucleotide) == *(candidate_segment + nucleotide))
                 {
                     temp_score += 2;
                 }
                 // if a character in the sample AND candidate are BASE PAIRS, add 1 to the score.
-                else if (is_base_pair(*(sample_segment+nucleotide), *(sample_segment+nucleotide) ))
+                else if (is_base_pair(*(sample_segment + nucleotide), *(sample_segment + nucleotide)))
                 {
                     temp_score += 1;
-                
+
                 }
 
                 else
@@ -384,17 +390,18 @@ int calculate_score(char* sample_segment, char* candidate_segment)
                 }
 
 
+            }
+
+            // whenever temp_score exceeds the max score, set max score to the new max value from temp_score
+            if (temp_score > score)
+                score = temp_score;
+
+            iterations++;
         }
 
-        // whenever temp_score exceeds the max score, set max score to the new max value from temp_score
-        if (temp_score > score)
-            score = temp_score;
 
 
+        // Insert your code here (replace this return statement with your own code)
+        return 0;
     }
-
-
-
-    // Insert your code here (replace this return statement with your own code)
-    return 0;
 }
