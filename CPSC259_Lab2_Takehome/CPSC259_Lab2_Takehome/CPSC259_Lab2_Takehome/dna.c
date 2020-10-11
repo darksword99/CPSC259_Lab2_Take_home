@@ -350,30 +350,46 @@ int calculate_score(char* sample_segment, char* candidate_segment)
         {
             temp_score += 10;
         }
-        else if/*int get_codon_index(char* codon_code)
-      {
-        int i;
-        for (i = 0; i < NUMBER_OF_CODONS; ++i) {
-
-          if (codon_codes[i][0] == codon_code[0] &&
-            codon_codes[i][1] == codon_code[1] &&
-            codon_codes[i][2] == codon_code[2]) {
-            return i;
-          }
-        }
-        return -1;
-      }*/
+        /*int get_codon_index(char* codon_code)*/
+        else if (get_codon_index(*sample_segment) == get_codon_index(*candidate_segment))
         {
-
+        
+        temp_score += 5;
 
         }
 
         else {
 
+            // So now we know that neither the codons are identical, OR different but specify the same amino acid
+            // Time to check manually (check each nucleotide in the current sample and candidate codons)
 
+            for (int nucleotide = 0; nucleotide <= 2; nucleotide++)
+            {
+                // if a character in the sample AND candidate is the same, add 2 to the score
+                if ( *(sample_segment+nucleotide) == *(candidate_segment+nucleotide) )
+                {
+                    temp_score += 2;
+                }
+                // if a character in the sample AND candidate are BASE PAIRS, add 1 to the score.
+                else if (is_base_pair(*(sample_segment+nucleotide), *(sample_segment+nucleotide) ))
+                {
+                    temp_score += 1;
+                
+                }
+
+                else
+                {
+                    temp_score += 0;
+                    break; // do nothing and break from the loop
+                }
 
 
         }
+
+        // whenever temp_score exceeds the max score, set max score to the new max value from temp_score
+        if (temp_score > score)
+            score = temp_score;
+
 
     }
 
