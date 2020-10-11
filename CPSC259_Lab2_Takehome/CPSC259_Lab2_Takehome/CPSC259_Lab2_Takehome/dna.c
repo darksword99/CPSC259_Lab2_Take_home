@@ -264,21 +264,21 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
             strcat(outputline_buffer, "Candidate number ");
             strcat(outputline_buffer, int_buffer);
             strcat(outputline_buffer, " is a perfect match\n");*/
-    sample_length = strlen(sample_segment);
-    candidate_length = strlen(candidate_segments);
+    int sample_length = strlen(*sample_segment);
+    int candidate_length = strlen(**candidate_segments);
 
 
 
     for (int i = 0; i < number_of_candidates; i++) {
 
-        if (strcmp(sample_segment, candidate_segments[i]) == 0)
+        if (strcmp(*sample_segment, *candidate_segments) == 0)
         {
             sprintf(int_buffer, "%d", i); // stores candidate number in char array int_buffer
-            strcat(sample_segment, "Candidate number ");
-            strcat(sample_segment, int_buffer);
-            strcat(sample_segment, " is a perfect match\n");
+            strcat(*sample_segment, "Candidate number ");
+            strcat(*sample_segment, int_buffer);
+            strcat(*sample_segment, " is a perfect match\n");
 
-
+            printf("Candidate %d is a perfect match.", i + 1);
             has_perfect_match++;
             // Insert your code here
 
@@ -294,15 +294,14 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
        Don't forget to clear your outputline_buffer for each new line*/
     for (i = 0; i < number_of_candidates; ++i) {
 
-        score = calculate_score(sample_segment, *candidate_segments);// Insert your code here - maybe a call to calculate_score?
-
+        score = calculate_score(*sample_segment, *candidate_segments);// Insert your code here - maybe a call to calculate_score?
+        printf("Candidate %d has score of %d.", i + 1, score);
 
     }
 
     /* End of function */
     return;
 }
-
 /*
  * Compares the sample segment and the candidate segment and calculates a
  * score based on these rules:
