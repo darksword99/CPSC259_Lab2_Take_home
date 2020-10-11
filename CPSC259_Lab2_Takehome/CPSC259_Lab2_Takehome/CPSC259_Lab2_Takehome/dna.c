@@ -278,28 +278,32 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
             strcat(sample_segment, int_buffer);
             strcat(sample_segment, " is a perfect match\n");
 
-
+            printf("Candidate %d is a perfect match.", i + 1);
             has_perfect_match++;
             // Insert your code here
-
+            return;
           /* Hint: Return early if we have found and reported perfect match(es) */
         }
     }
 
-    if (has_perfect_match != 0)
-        return;
+    
     /* Hint: Otherwise we need to calculate and print all of the scores by invoking
        calculate_score for each candidate_segment. Write an output line for each
        candidate_segment and concatenate your line to output_string.
        Don't forget to clear your outputline_buffer for each new line*/
     for (i = 0; i < number_of_candidates; ++i) {
 
-        score = calculate_score(sample_segment, *candidate_segments);// Insert your code here - maybe a call to calculate_score?
-
-
+        score = calculate_score(sample_segment, candidate_segments[i]);// Insert your code here - maybe a call to calculate_score?
+        sprintf(outputline_buffer, "Candidate %d has score of %d.\n", i + 1, score);
+        strcat(output_string, outputline_buffer);
+        //strcat(output_string, '\0');
+        outputline_buffer[i] = '\0';
+       // printf("Candidate %d has score of %d.\n", i + 1, score);
     }
+ 
 
     /* End of function */
+    //free(outputline_buffer);
     return;
 }
 
@@ -347,37 +351,41 @@ int calculate_score(char* sample_segment, char* candidate_segment)
      */
     for (int i = 0; i < sample_length_in_codons; i++) {
 
+
         if (iterations == sample_length_in_codons)
         {
             break;
         }
 
-        if (strncmp(sample_segment, candidate_segment, 3) == 0)
+        for (int num_codons = 0; num_codons < sample_length_in_codons; num_codons++)
         {
-            temp_score += 10;
-        }
-        /*int get_codon_index(char* codon_code)*/
-        else if (get_codon_index(*sample_segment) == get_codon_index(*candidate_segment))
-        {
+            if (strncmp((sample_segment + 3 * iterations), (candidate_segment), sample_length_in_codons * 3) == 0)
+            {
+                temp_score += 10;
+            }
 
-            temp_score += 5;
+            else if (get_codon_index(sample_segment + 3 * num_codons) == get_codon_index(candidate_segment + 3 * iterations + 3 * num_codons))
+            {
 
-        }
+                temp_score += 5;
 
-        else {
+            }
 
+        
+
+            else {
             // So now we know that neither the codons are identical, OR different but specify the same amino acid
             // Time to check manually (check each nucleotide in the current sample and candidate codons)
 
             for (int nucleotide = 0; nucleotide <= 2; nucleotide++)
             {
                 // if a character in the sample AND candidate is the same, add 2 to the score
-                if (*(sample_segment + nucleotide) == *(candidate_segment + nucleotide))
+                if ((sample_segment + 3 * num_codons + nucleotide) == (candidate_segment + 3 * num_codons + 3 * iterations + nucleotide))
                 {
                     temp_score += 2;
                 }
                 // if a character in the sample AND candidate are BASE PAIRS, add 1 to the score.
-                else if (is_base_pair(*(sample_segment + nucleotide), *(sample_segment + nucleotide)))
+                else if (is_base_pair(*(sample_segment + 3 * num_codons + nucleotide), *(candidate_segment + 3 * iterations + 3 * num_codons + nucleotide)))
                 {
                     temp_score += 1;
 
@@ -386,22 +394,29 @@ int calculate_score(char* sample_segment, char* candidate_segment)
                 else
                 {
                     temp_score += 0;
-                    break; // do nothing and break from the loop
                 }
 
 
             }
-
-            // whenever temp_score exceeds the max score, set max score to the new max value from temp_score
-            if (temp_score > score)
-                score = temp_score;
-
-            iterations++;
         }
 
 
 
+
+        }
+     }
+
+        iterations += 1;
         // Insert your code here (replace this return statement with your own code)
-        return 0;
+
+    
+
+
+    // whenever temp_score exceeds the max score, set max score to the new max value from temp_score
+    if (temp_score > score)
+    {
+        score = temp_score;
     }
+
+    return score;
 }
