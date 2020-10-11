@@ -264,14 +264,14 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
             strcat(outputline_buffer, "Candidate number ");
             strcat(outputline_buffer, int_buffer);
             strcat(outputline_buffer, " is a perfect match\n");*/
-    sample_length = strlen(sample_segment);
-    candidate_length = strlen(candidate_segments);
+    int sample_length = strlen(*sample_segment);
+    int candidate_length = strlen(**candidate_segments);
 
 
 
     for (int i = 0; i < number_of_candidates; i++) {
 
-        if (strcmp(sample_segment, candidate_segments[i]) == 0)
+        if (strcmp(*sample_segment, *candidate_segments) == 0)
         {
             sprintf(int_buffer, "%d", i); // stores candidate number in char array int_buffer
             strcat(sample_segment, "Candidate number ");
@@ -300,13 +300,11 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
         outputline_buffer[i] = '\0';
        // printf("Candidate %d has score of %d.\n", i + 1, score);
     }
- 
 
     /* End of function */
     //free(outputline_buffer);
     return;
 }
-
 /*
  * Compares the sample segment and the candidate segment and calculates a
  * score based on these rules:
