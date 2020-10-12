@@ -96,8 +96,6 @@ int get_codon_index(char* codon_code)
     return -1;
 }
 
-
-
 /*
  * Extracts the DNA segment information stored in a correctly formatted file.
  *
@@ -254,7 +252,6 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
     char outputline_buffer[BUFSIZE] = "\0";
     char int_buffer[BUFSIZE];
 
-
     /* Hint: Check to see if any candidate segment(s) are a perfect match, and report them
        (REMEMBER: don't ignore trailing nucleotides when searching for a perfect score)
        Report the result by concatenating to output_string using the strcat(...) function.
@@ -276,13 +273,8 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
            strcat(outputline_buffer, "Candidate number ");
             strcat(outputline_buffer, int_buffer);
             strcat(outputline_buffer, " is a perfect match\n");
-            
-            // sprintf(output_string, "%s", outputline_buffer);
             sprintf(output_string, "%s", outputline_buffer);
-            
-
             has_perfect_match++;
-            // Insert your code here
             return;
           /* Hint: Return early if we have found and reported perfect match(es) */
         }
@@ -297,8 +289,6 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
         score = calculate_score(sample_segment, candidate_segments[i]);// Insert your code here - maybe a call to calculate_score?
         sprintf(outputline_buffer, "Candidate number %d matches with a score of %d\n", i + 1, score);
         strcat(output_string, outputline_buffer);
-        //strcat(output_string, '\0');
-       // printf("Candidate %d has score of %d.\n", i + 1, score);
     }
     
     return;
@@ -339,45 +329,69 @@ int calculate_score(char* sample_segment, char* candidate_segment)
     int max_score = 0;
     int sample_length_in_codons = strlen(sample_segment) / 3;
     int candidate_length = strlen(candidate_segment);
+
+    // maximum number of shifts determined by the codon length of the candidate - codon length of the sample
     int max_shifts = (candidate_length / 3) - sample_length_in_codons;
 
+    // iterator variable goes from start to max_shift value.
+    // helps implement codon shift portion of the algorithm
      for (int iterations = 0; iterations <= max_shifts; iterations++)
     {
-         int temp_score = 0;
-         int candidate_start = iterations * 3;
-         int candidate_end = candidate_start + sample_length_in_codons;
+         int temp_score = 0; // reset temp_score to 0 upon every codon shift
+         int candidate_start = iterations * 3; // "start" location of the candidate segment after iterations
+         int candidate_end = candidate_start + sample_length_in_codons; // finding where the candidate ends
+         // if the candidate end is off from the last element in candidate by greater than one codon, stop calculating the score!
          if (candidate_end > (candidate_length + 2))
              break;
 
+        // now here we iterate over the sample codons, and this loop is inside the outer "codon shift" loop
         for (int codon = 0; codon < sample_length_in_codons; codon++)
         {
-
+            /* we call get_codon index twice (one for sample and one for candidate) and store the corresponding indices 
+            *  from the 2D codon_codes array into sample_codon_index and candidate_codon_index respectively
+            */
             int sample_codon_index = get_codon_index(&sample_segment[3 * codon]);
             int candidate_codon_index = get_codon_index(&candidate_segment[3 * codon + 3 * iterations]);
             
+            // compare sample codon to candidate codon: if they exactly match, add 10 to the temp_score
             if (strncmp((sample_segment + 3 * codon), (candidate_segment + 3 * codon + 3 * iterations), CODON_LENGTH) == 0)
             {
                 temp_score += 10;
             }
+            /* compare sample codon to candidate_codon: if they DON'T exactly match, but correspond 
+            *  to the same amino acid, add 5 to the temp_score
+            */
             else if ( (strcmp(codon_names[sample_codon_index], codon_names[candidate_codon_index]) == 0) )
             {
                 temp_score += 5;
             }
             else
             {
+                /* so the codons DON'T match exactly AND they don't map to the same amino acid?
+                *  Time to enter yet another loop (it's painful I know!! ain't that life sometimes?) to check the codons nucleotide by nucleotide
+                *  (since 1 codon = 3 nucleotides = this loop goes 3 times)
+                */
                 for (int nucleotide = 0; nucleotide <= 2; nucleotide++)
                 {
+                    /*
+                    * assign the current sample and candidate nucleotides to two respective variables to simplify the if-else if-else statements
+                    *
+                    */
                     char current_sample_nucleotide = sample_segment[nucleotide + 3*codon];
                     char current_candidate_nucleotide = candidate_segment[3 * codon + 3 * iterations + nucleotide];
 
+                    // is the sample_nucleotide EQUAL to the candidate_nucleotide? Cool! if so, add 2 to the temp_score
                     if (current_sample_nucleotide == current_candidate_nucleotide)
                     {
                         temp_score += 2;
                     }
+                    // are the sample_nucleotide and the candidate_nucleotide base pairs of each other? Cool! if so, add 1 to the temp_score
                     else if (is_base_pair( current_sample_nucleotide, current_candidate_nucleotide ) == 1 )
                     {
                         temp_score += 1;
                     }
+                    // Are they completely different then (no similarity AND base_pairing)?
+                    // That's really wack!! DO NOTHING!!
                     else
                     {
                         temp_score += 0;
@@ -387,10 +401,15 @@ int calculate_score(char* sample_segment, char* candidate_segment)
             }
 
         }
-
+        
+        /* after a remarkable journey (one iteration of checking the sample segment with a candidate segment),
+        *  check if the temp_score is larger than the previously computed max_score
+        *  If temp_score > max_score, then max_score takes on the value of temp_score as the new max value
+        */
         max_score = (temp_score > max_score) ? temp_score : max_score;
 
     }
+    // after analyzing one whole candidate segment against the sample, return the max_score for the candidate.
     return max_score;
 
 }
