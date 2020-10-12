@@ -9,7 +9,7 @@
  Author:			Saif Abdelazim and Sizhe Yan
  Student #s:	62639422 and 22164982
  CS Accounts:	n4d3b and q8k3b
- Date:				October 6th, 2020
+ Date:				October 12th, 2020
  */
 
  /******************************************************************
@@ -33,6 +33,7 @@
 #include <string.h>
 #include <time.h>
 #include "dna.h"
+
 
 
 /*
@@ -244,7 +245,7 @@ int extract_dna(FILE* file_pointer, char** sample_segment, char*** candidate_seg
 void analyze_segments(char* sample_segment, char** candidate_segments, int number_of_candidates, char* output_string)
 {
     /* Some helpful variables you might want to use */
-    int* scores = NULL;
+    //int* scores = NULL;
     int sample_length = 0;
     int candidate_length = 0;
     int i = 0;
@@ -264,46 +265,44 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
             strcat(outputline_buffer, "Candidate number ");
             strcat(outputline_buffer, int_buffer);
             strcat(outputline_buffer, " is a perfect match\n");*/
-    int sample_length = strlen(*sample_segment);
-    int candidate_length = strlen(**candidate_segments);
-
-
+    sample_length = strlen(sample_segment);
+    candidate_length = strlen(*candidate_segments);
 
     for (int i = 0; i < number_of_candidates; i++) {
-
-        if (strcmp(*sample_segment, *candidate_segments) == 0)
+        *output_string = '\0';
+        if (strcmp(sample_segment, candidate_segments[i]) == 0)
         {
-            sprintf(int_buffer, "%d", i); // stores candidate number in char array int_buffer
-            strcat(sample_segment, "Candidate number ");
-            strcat(sample_segment, int_buffer);
-            strcat(sample_segment, " is a perfect match\n");
+            sprintf(int_buffer, "%d", i + 1); // stores candidate number in char array int_buffer
+           strcat(outputline_buffer, "Candidate number ");
+            strcat(outputline_buffer, int_buffer);
+            strcat(outputline_buffer, " is a perfect match\n");
+            
+            // sprintf(output_string, "%s", outputline_buffer);
+            sprintf(output_string, "%s", outputline_buffer);
+            
 
-            printf("Candidate %d is a perfect match.", i + 1);
             has_perfect_match++;
             // Insert your code here
             return;
           /* Hint: Return early if we have found and reported perfect match(es) */
         }
     }
-
     
     /* Hint: Otherwise we need to calculate and print all of the scores by invoking
        calculate_score for each candidate_segment. Write an output line for each
        candidate_segment and concatenate your line to output_string.
        Don't forget to clear your outputline_buffer for each new line*/
     for (i = 0; i < number_of_candidates; ++i) {
-
+        *outputline_buffer = '\0';
         score = calculate_score(sample_segment, candidate_segments[i]);// Insert your code here - maybe a call to calculate_score?
-        sprintf(outputline_buffer, "Candidate %d has score of %d.\n", i + 1, score);
+        sprintf(outputline_buffer, "Candidate number %d matches with a score of %d\n", i + 1, score);
         strcat(output_string, outputline_buffer);
         //strcat(output_string, '\0');
-        outputline_buffer[i] = '\0';
        // printf("Candidate %d has score of %d.\n", i + 1, score);
     }
-
-    /* End of function */
-    //free(outputline_buffer);
+    
     return;
+    /* End of function */
 }
 /*
  * Compares the sample segment and the candidate segment and calculates a
@@ -337,84 +336,61 @@ void analyze_segments(char* sample_segment, char** candidate_segments, int numbe
 int calculate_score(char* sample_segment, char* candidate_segment)
 {
     /* Some helpful variables you might (or might not) want to use */
-    int temp_score = 0;
-    int score = 0;
-    int iterations = 0;
-    int sample_length = strlen(sample_segment);
+    int max_score = 0;
+    int sample_length_in_codons = strlen(sample_segment) / 3;
     int candidate_length = strlen(candidate_segment);
-    int sample_length_in_codons = sample_length / 3;
+    int max_shifts = (candidate_length / 3) - sample_length_in_codons;
 
-    /*    4. For each of the LENGTH codons:
-     *    a) if the two codons are exactly the same, add 10 to the score
-     */
-    for (int i = 0; i < sample_length_in_codons; i++) {
+     for (int iterations = 0; iterations <= max_shifts; iterations++)
+    {
+         int temp_score = 0;
+         int candidate_start = iterations * 3;
+         int candidate_end = candidate_start + sample_length_in_codons;
+         if (candidate_end > (candidate_length + 2))
+             break;
 
-
-        if (iterations == sample_length_in_codons)
+        for (int codon = 0; codon < sample_length_in_codons; codon++)
         {
-            break;
-        }
 
-        for (int num_codons = 0; num_codons < sample_length_in_codons; num_codons++)
-        {
-            if (strncmp((sample_segment + 3 * iterations), (candidate_segment), sample_length_in_codons * 3) == 0)
+            int sample_codon_index = get_codon_index(&sample_segment[3 * codon]);
+            int candidate_codon_index = get_codon_index(&candidate_segment[3 * codon + 3 * iterations]);
+            
+            if (strncmp((sample_segment + 3 * codon), (candidate_segment + 3 * codon + 3 * iterations), CODON_LENGTH) == 0)
             {
                 temp_score += 10;
             }
-
-            else if (get_codon_index(sample_segment + 3 * num_codons) == get_codon_index(candidate_segment + 3 * iterations + 3 * num_codons))
+            else if ( (strcmp(codon_names[sample_codon_index], codon_names[candidate_codon_index]) == 0) )
             {
-
                 temp_score += 5;
-
             }
-
-        
-
-            else {
-            // So now we know that neither the codons are identical, OR different but specify the same amino acid
-            // Time to check manually (check each nucleotide in the current sample and candidate codons)
-
-            for (int nucleotide = 0; nucleotide <= 2; nucleotide++)
+            else
             {
-                // if a character in the sample AND candidate is the same, add 2 to the score
-                if ((sample_segment + 3 * num_codons + nucleotide) == (candidate_segment + 3 * num_codons + 3 * iterations + nucleotide))
+                for (int nucleotide = 0; nucleotide <= 2; nucleotide++)
                 {
-                    temp_score += 2;
-                }
-                // if a character in the sample AND candidate are BASE PAIRS, add 1 to the score.
-                else if (is_base_pair(*(sample_segment + 3 * num_codons + nucleotide), *(candidate_segment + 3 * iterations + 3 * num_codons + nucleotide)))
-                {
-                    temp_score += 1;
+                    char current_sample_nucleotide = sample_segment[nucleotide + 3*codon];
+                    char current_candidate_nucleotide = candidate_segment[3 * codon + 3 * iterations + nucleotide];
+
+                    if (current_sample_nucleotide == current_candidate_nucleotide)
+                    {
+                        temp_score += 2;
+                    }
+                    else if (is_base_pair( current_sample_nucleotide, current_candidate_nucleotide ) == 1 )
+                    {
+                        temp_score += 1;
+                    }
+                    else
+                    {
+                        temp_score += 0;
+                    }
 
                 }
-
-                else
-                {
-                    temp_score += 0;
-                }
-
-
             }
-        }
-
-
-
 
         }
-     }
 
-        iterations += 1;
-        // Insert your code here (replace this return statement with your own code)
+        max_score = (temp_score > max_score) ? temp_score : max_score;
 
-    
-
-
-    // whenever temp_score exceeds the max score, set max score to the new max value from temp_score
-    if (temp_score > score)
-    {
-        score = temp_score;
     }
+    return max_score;
 
-    return score;
 }

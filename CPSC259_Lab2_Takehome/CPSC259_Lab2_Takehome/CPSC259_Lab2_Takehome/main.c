@@ -1,10 +1,10 @@
 /*
  File:        main.c
  Purpose:     Interactive driver for CPSC 259 Lab2 Takehome
- Author:			Your names
- Student #s:	12345678 and 12345678
- CS Accounts:	a1a1 and b2b2
- Date:				Add the date here
+ Author:			Saif Abdelazim and Sizhe Yan
+ Student #s:	62639422 and 22164982
+ CS Accounts:	n4d3b and q8k3b
+ Date:				October 12, 2020
 */
 
  /******************************************************************
@@ -39,6 +39,7 @@ void   clear_memory(char** sample_segment, char*** candidate_segments, int* numb
 int    load_file(char** sample_segment, char*** candidate_segments);
 void   end_program(int exit_value);
 void   get_user_input(char* message, char* response);
+// int sameacid(int sample_index, int candidate_index);
 
 /*
  * Main function drives the program.
@@ -259,3 +260,14 @@ void get_user_input(char* message, char* response)
 
   return;
 }
+
+/* int sameacid(int sample_index, int candidate_index) {
+
+    
+        if (strcmp(&codon_names[sample_index], &codon_names[candidate_index]) == 0)
+            return 1;
+        else
+            return 0;
+}
+
+*/

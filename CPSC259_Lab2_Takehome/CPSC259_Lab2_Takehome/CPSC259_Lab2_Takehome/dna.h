@@ -2,10 +2,10 @@
  File:        dna.h
  Purpose:     Contains constants, prototypes, and two
               helpful arrays.
- Author:			Saif Abdelazim
- Student #s:	62639422 and 12345678
- CS Accounts:	n4d3b and b2b2
- Date:				October 6, 2020
+ Author:			Saif Abdelazim and Sizhe Yan
+ Student #s:	62639422 and 22164982
+ CS Accounts:	n4d3b and q8k3b
+ Date:				October 12, 2020
  */
 
  /******************************************************************
@@ -34,6 +34,7 @@ int    get_codon_index(char* codon_code);
 int    extract_dna(FILE* file_pointer, char** sample_segment, char*** candidate_segments);
 void   analyze_segments(char* sample_segment, char** candidate_segments, int number_of_candidates, char* output_string);
 int    calculate_score(char* sample_segment, char* candidate_segment);
+// int sameacid(int sample_index, int candidate_index);
 
 static char codon_codes[NUMBER_OF_CODONS][CODON_SYMBOL_LENGTH] =
 { "TTT", "TTC", "TTA", "TTG", "CTT", "CTC",
